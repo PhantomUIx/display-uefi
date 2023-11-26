@@ -51,7 +51,7 @@ fn impl_info(ctx: *anyopaque) anyerror!phantom.display.Surface.Info {
 
 fn impl_update_info(ctx: *anyopaque, info: phantom.display.Surface.Info, fields: []std.meta.FieldEnum(phantom.display.Surface.Info)) anyerror!void {
     const self: *Self = @ptrCast(@alignCast(ctx));
-    const outputFields = std.ArrayList(std.meta.FieldEnum(phantom.display.Surface.Info)).init(self.output.display.allocator);
+    var outputFields = std.ArrayList(std.meta.FieldEnum(phantom.display.Output.Info)).init(self.output.display.allocator);
     defer outputFields.deinit();
 
     const outputInfo = try self.output.base.info();
@@ -65,12 +65,13 @@ fn impl_update_info(ctx: *anyopaque, info: phantom.display.Surface.Info, fields:
     }
 
     return self.output.base.updateInfo(.{
+        .scale = outputInfo.scale,
         .format = info.format orelse outputInfo.format,
         .size = .{
             .phys = info.size.cast(f32),
             .res = info.size,
         },
-    }, fields);
+    }, outputFields.items);
 }
 
 fn impl_create_scene(ctx: *anyopaque, backendType: phantom.scene.BackendType) anyerror!*phantom.scene.Base {

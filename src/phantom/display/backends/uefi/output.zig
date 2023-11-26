@@ -19,6 +19,7 @@ pub fn new(display: *Display, protocol: *std.os.uefi.protocol.GraphicsOutput) !*
         .base = .{
             .ptr = self,
             .vtable = &.{
+                .surfaces = impl_surfaces,
                 .createSurface = impl_create_surface,
                 .info = impl_info,
                 .updateInfo = impl_update_info,
@@ -35,39 +36,52 @@ pub fn new(display: *Display, protocol: *std.os.uefi.protocol.GraphicsOutput) !*
     return self;
 }
 
-fn infoFromMode(self: *Self, info: *std.os.uefi.protocol.GraphicsOutput) !phantom.display.Output.Info {
-    const res = vizops.vector.UsizeVector2.init(.{
+fn infoFromMode(self: *Self, info: *std.os.uefi.protocol.GraphicsOutput.Mode.Info) !phantom.display.Output.Info {
+    const res = vizops.vector.UsizeVector2.init([_]usize{
         @as(usize, @intCast(info.horizontal_resolution)),
         @as(usize, @intCast(info.vertical_resolution)),
     });
 
     return .{
-        .enabled = true,
+        .enable = true,
         .size = .{
-            .phys = res.cast(f32),
-            .res = res,
+            .phys = .{ .value = res.cast(f32).value },
+            .res = .{ .value = res.value },
         },
-        .scale = self.scale,
+        .scale = .{ .value = self.scale.value },
         .name = "UEFI GOP",
-        .manufacturer = std.os.uefi.system_table.firmware_vendor[0..std.os.uefi.system_table.firmware_vendor.len],
-        .format = try switch (info.pixel_format) {
+        .manufacturer = "Unknown",
+        .format = switch (info.pixel_format) {
             .RedGreenBlueReserved8BitPerColor => .{
                 .rgbx = .{
-                    info.red_mask * @sizeOf(u8),
-                    info.green_mask * @sizeOf(u8),
-                    info.blue_mask * @sizeOf(u8),
+                    @intCast(info.pixel_information.red_mask * @sizeOf(u8)),
+                    @intCast(info.pixel_information.green_mask * @sizeOf(u8)),
+                    @intCast(info.pixel_information.blue_mask * @sizeOf(u8)),
+                    @intCast(info.pixel_information.reserved_mask * @sizeOf(u8)),
                 },
             },
             .BlueGreenRedReserved8BitPerColor => .{
                 .bgrx = .{
-                    info.blue_mask * @sizeOf(u8),
-                    info.green_mask * @sizeOf(u8),
-                    info.red_mask * @sizeOf(u8),
+                    @intCast(info.pixel_information.blue_mask * @sizeOf(u8)),
+                    @intCast(info.pixel_information.green_mask * @sizeOf(u8)),
+                    @intCast(info.pixel_information.red_mask * @sizeOf(u8)),
+                    @intCast(info.pixel_information.reserved_mask * @sizeOf(u8)),
                 },
             },
-            else => error.InvalidPixelFormat,
+            else => return error.InvalidPixelFormat,
         },
     };
+}
+
+fn impl_surfaces(ctx: *anyopaque) anyerror!std.ArrayList(*phantom.display.Surface) {
+    const self: *Self = @ptrCast(@alignCast(ctx));
+    var surfaces = std.ArrayList(*phantom.display.Surface).init(self.display.allocator);
+    errdefer surfaces.deinit();
+
+    if (self.surface) |surf| {
+        try surfaces.append(&surf.base);
+    }
+    return surfaces;
 }
 
 fn impl_create_surface(ctx: *anyopaque, kind: phantom.display.Surface.Kind, _: phantom.display.Surface.Info) anyerror!*phantom.display.Surface {
@@ -77,7 +91,7 @@ fn impl_create_surface(ctx: *anyopaque, kind: phantom.display.Surface.Kind, _: p
     if (self.surface) |_| return error.AlreadyExists;
 
     self.surface = try Surface.new(self);
-    return self.surface.?;
+    return &self.surface.?.base;
 }
 
 fn impl_info(ctx: *anyopaque) anyerror!phantom.display.Output.Info {
@@ -107,23 +121,23 @@ fn impl_update_info(ctx: *anyopaque, info: phantom.display.Output.Info, fields: 
         }
     }
 
-    if (changeScale) self.scale = info.scale;
+    if (changeScale) self.scale.value = info.scale.value;
 
-    var i: usize = 0;
+    var i: u32 = 0;
     while (i < self.protocol.mode.max_mode) : (i += 1) {
         var modeInfo: *std.os.uefi.protocol.GraphicsOutput.Mode.Info = undefined;
         var info_size: usize = undefined;
         if (self.protocol.queryMode(i, &info_size, &modeInfo) != .Success) continue;
 
-        if (self.infoFromMode(modeInfo)) |infoMode| {
+        if (self.infoFromMode(modeInfo) catch null) |infoMode| {
             const matchesSize = infoMode.size.res.eq(if (changeSize) info.size.res else origInfo.size.res);
             const matchesFormat = infoMode.format.eq(if (changeFormat) info.format else origInfo.format);
 
             if (matchesSize and matchesFormat) {
-                try self.protocol.setMode(i).status();
+                try self.protocol.setMode(i).err();
                 return;
             }
-        } else continue;
+        }
     }
 
     return error.UnmatchedMode;
@@ -131,6 +145,6 @@ fn impl_update_info(ctx: *anyopaque, info: phantom.display.Output.Info, fields: 
 
 fn impl_deinit(ctx: *anyopaque) void {
     const self: *Self = @ptrCast(@alignCast(ctx));
-    if (self.surface) |surface| surface.deinit();
+    if (self.surface) |surface| surface.base.deinit();
     self.display.allocator.destroy(self);
 }
