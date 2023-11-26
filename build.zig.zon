@@ -3,13 +3,13 @@
   .version = "0.1.0",
   .paths = .{"."},
   .dependencies = .{
-    .metaplus = .{
+    .@"meta+" = .{
       .url = "https://github.com/MidstallSoftware/meta-plus/archive/cadadc017bb2d768c55cc9102ad28441fae902d4.tar.gz",
       .hash = "12208a02f49d9e18ff7b29a676810ad2f5593743006cd30c2a7d4bf8dc9ae39ce5a5",
     },
     .phantom = .{
-      .url = "https://github.com/PhantomUIx/core/archive/2c14d9551e9659f38b2620848a6718bd71f4bc8c.tar.gz",
-      .hash = "1220fde1741c9d0e75d50c8caec711305325fb46adedf7be1e05665f11c095c13ce2",
+      .url = "https://github.com/PhantomUIx/core/archive/2646d5559bc49ed09f08562b0a72737b9d9eb412.tar.gz",
+      .hash = "12205969c3bc047bea9d42ddd7c0486da4a519430b1dc2e02f190debb1afdefae465",
     },
     .vizops = .{
       .url = "https://github.com/MidstallSoftware/vizops/archive/1bc78769d9853e2b93740d2a8542993625f31b9f.tar.gz",

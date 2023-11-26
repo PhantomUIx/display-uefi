@@ -6,6 +6,7 @@ pub usingnamespace if (@typeInfo(@TypeOf(Phantom.Sdk)) != .Null) struct {
         .provides = .{
             .displays = &.{"uefi"},
         },
+        .dependencies = &.{ "meta+", "vizops" },
     };
 } else struct {};
 
@@ -15,7 +16,7 @@ pub fn build(b: *std.Build) void {
     const no_importer = b.option(bool, "no-importer", "disables the import system (not recommended)") orelse false;
     const no_docs = b.option(bool, "no-docs", "skip installing documentation") orelse false;
 
-    const metaplus = b.dependency("metaplus", .{
+    const metaplus = b.dependency("meta+", .{
         .target = target,
         .optimize = optimize,
     });
