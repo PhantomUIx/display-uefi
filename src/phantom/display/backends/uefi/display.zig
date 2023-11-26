@@ -41,8 +41,11 @@ pub fn import(comptime phantom: type) type {
             if (self.output) |output| {
                 outputs.appendAssumeCapacity(@constCast(&output.base));
             } else {
-                // TODO: create the output.
-                return error.NoOutputs;
+                var protocol: ?*std.os.uefi.protocol.GraphicsOutput = undefined;
+                try std.os.uefi.system_table.boot_services.locateProtocol(&std.os.uefi.protocol.GraphicsOutput.guid, null, @as(*?*anyopaque, @ptrCast(&protocol))).err();
+
+                self.output = try Output.new(self, protocol);
+                outputs.appendAssumeCapacity(@constCast(&self.output.?.base));
             }
 
             return outputs;
