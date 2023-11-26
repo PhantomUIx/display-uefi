@@ -12,6 +12,7 @@ pub usingnamespace if (@typeInfo(@TypeOf(Phantom.Sdk)) != .Null) struct {
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
+    const no_importer = b.option(bool, "no-importer", "disables the import system (not recommended)") orelse false;
     const no_docs = b.option(bool, "no-docs", "skip installing documentation") orelse false;
 
     const metaplus = b.dependency("metaplus", .{
@@ -27,6 +28,7 @@ pub fn build(b: *std.Build) void {
     const phantom = b.dependency("phantom", .{
         .target = target,
         .optimize = optimize,
+        .@"no-importer" = no_importer,
     });
 
     _ = b.addModule("phantom.display.uefi", .{
