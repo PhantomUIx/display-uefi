@@ -1,23 +1,8 @@
 const std = @import("std");
+const Phantom = @import("phantom");
 
-const Sdk = blk: {
-    const buildDeps = @import("root").dependencies;
-    for (buildDeps.root_deps) |dep| {
-        if (std.mem.eql(u8, dep[0], "phantom")) {
-            const pkg = @field(buildDeps.packages, dep[1]);
-            for (pkg.deps) |childDeps| {
-                if (std.mem.eql(u8, childDeps[0], "phantom-sdk")) {
-                    break :blk @field(buildDeps.packages, childDeps[1]).build_zig;
-                }
-            }
-        }
-    }
-
-    break :blk null;
-};
-
-pub usingnamespace if (@typeInfo(@TypeOf(Sdk)) != .Null) struct {
-    pub const phantomModule = Sdk.PhantomModule{
+pub usingnamespace if (@typeInfo(@TypeOf(Phantom.Sdk)) != .Null) struct {
+    pub const phantomModule = Phantom.Sdk.PhantomModule{
         .provides = .{
             .displays = &.{"uefi"},
         },
@@ -39,6 +24,11 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    const phantom = b.dependency("phantom", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
     _ = b.addModule("phantom.display.uefi", .{
         .source_file = .{ .path = b.pathFromRoot("src/phantom.zig") },
         .dependencies = &.{
@@ -49,6 +39,10 @@ pub fn build(b: *std.Build) void {
             .{
                 .name = "vizops",
                 .module = vizops.module("vizops"),
+            },
+            .{
+                .name = "phantom",
+                .module = phantom.module("phantom"),
             },
         },
     });
@@ -65,6 +59,7 @@ pub fn build(b: *std.Build) void {
 
     unit_tests.addModule("meta+", metaplus.module("meta+"));
     unit_tests.addModule("vizops", vizops.module("vizops"));
+    unit_tests.addModule("phantom", phantom.module("phantom"));
 
     const run_unit_tests = b.addRunArtifact(unit_tests);
     step_test.dependOn(&run_unit_tests.step);
