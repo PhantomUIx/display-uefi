@@ -42,8 +42,10 @@ fn impl_outputs(ctx: *anyopaque) anyerror!std.ArrayList(*phantom.display.Output)
         var protocol: ?*std.os.uefi.protocol.GraphicsOutput = undefined;
         try std.os.uefi.system_table.boot_services.?.locateProtocol(&std.os.uefi.protocol.GraphicsOutput.guid, null, @as(*?*anyopaque, @ptrCast(&protocol))).err();
 
-        self.output = try Output.new(self, protocol);
-        outputs.appendAssumeCapacity(@constCast(&self.output.?.base));
+        if (protocol) |proto| {
+            self.output = try Output.new(self, proto);
+            outputs.appendAssumeCapacity(@constCast(&self.output.?.base));
+        } else return error.BadProtocol;
     }
 
     return outputs;
