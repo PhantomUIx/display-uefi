@@ -1,0 +1,15 @@
+.{
+  .name = "phantom.display.uefi",
+  .version = "0.1.0",
+  .paths = .{"."},
+  .dependencies = .{
+    .metaplus = .{
+      .url = "https://github.com/MidstallSoftware/meta-plus/archive/cadadc017bb2d768c55cc9102ad28441fae902d4.tar.gz",
+      .hash = "12208a02f49d9e18ff7b29a676810ad2f5593743006cd30c2a7d4bf8dc9ae39ce5a5",
+    },
+    .vizops = .{
+      .url = "https://github.com/MidstallSoftware/vizops/archive/1bc78769d9853e2b93740d2a8542993625f31b9f.tar.gz",
+      .hash = "12209151b6cc1cf0efe8672d6d10aff2e8be2f8122e9a360b1792a49595bd1efa06e",
+    },
+  },
+}
