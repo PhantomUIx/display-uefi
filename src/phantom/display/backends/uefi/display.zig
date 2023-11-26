@@ -17,7 +17,7 @@ pub fn init(alloc: Allocator, kind: phantom.display.Base.Kind) Self {
 }
 
 pub fn deinit(self: *Self) void {
-    if (self.output) |o| o.deinit();
+    if (self.output) |o| o.base.deinit();
 }
 
 pub fn display(self: *Self) phantom.display.Base {
@@ -40,7 +40,7 @@ fn impl_outputs(ctx: *anyopaque) anyerror!std.ArrayList(*phantom.display.Output)
         outputs.appendAssumeCapacity(@constCast(&output.base));
     } else {
         var protocol: ?*std.os.uefi.protocol.GraphicsOutput = undefined;
-        try std.os.uefi.system_table.boot_services.locateProtocol(&std.os.uefi.protocol.GraphicsOutput.guid, null, @as(*?*anyopaque, @ptrCast(&protocol))).err();
+        try std.os.uefi.system_table.boot_services.?.locateProtocol(&std.os.uefi.protocol.GraphicsOutput.guid, null, @as(*?*anyopaque, @ptrCast(&protocol))).err();
 
         self.output = try Output.new(self, protocol);
         outputs.appendAssumeCapacity(@constCast(&self.output.?.base));
