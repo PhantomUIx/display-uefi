@@ -51,22 +51,12 @@ fn infoFromMode(self: *Self, info: *std.os.uefi.protocol.GraphicsOutput.Mode.Inf
         .scale = .{ .value = self.scale.value },
         .name = "UEFI GOP",
         .manufacturer = "Unknown",
-        .format = switch (info.pixel_format) {
+        .colorFormat = switch (info.pixel_format) {
             .RedGreenBlueReserved8BitPerColor => .{
-                .rgbx = .{
-                    @intCast(info.pixel_information.red_mask * @sizeOf(u8)),
-                    @intCast(info.pixel_information.green_mask * @sizeOf(u8)),
-                    @intCast(info.pixel_information.blue_mask * @sizeOf(u8)),
-                    @intCast(info.pixel_information.reserved_mask * @sizeOf(u8)),
-                },
+                .rgbx = @splat(8),
             },
             .BlueGreenRedReserved8BitPerColor => .{
-                .bgrx = .{
-                    @intCast(info.pixel_information.blue_mask * @sizeOf(u8)),
-                    @intCast(info.pixel_information.green_mask * @sizeOf(u8)),
-                    @intCast(info.pixel_information.red_mask * @sizeOf(u8)),
-                    @intCast(info.pixel_information.reserved_mask * @sizeOf(u8)),
-                },
+                .bgrx = @splat(8),
             },
             else => return error.InvalidPixelFormat,
         },
@@ -116,7 +106,7 @@ fn impl_update_info(ctx: *anyopaque, info: phantom.display.Output.Info, fields: 
         switch (field) {
             .size => changeSize = true,
             .scale => changeScale = true,
-            .format => changeFormat = true,
+            .colorFormat => changeFormat = true,
             else => return error.UnsupportedField,
         }
     }
@@ -131,7 +121,7 @@ fn impl_update_info(ctx: *anyopaque, info: phantom.display.Output.Info, fields: 
 
         if (self.infoFromMode(modeInfo) catch null) |infoMode| {
             const matchesSize = infoMode.size.res.eq(if (changeSize) info.size.res else origInfo.size.res);
-            const matchesFormat = infoMode.format.eq(if (changeFormat) info.format else origInfo.format);
+            const matchesFormat = infoMode.colorFormat.eq(if (changeFormat) info.colorFormat else origInfo.colorFormat);
 
             if (matchesSize and matchesFormat) {
                 try self.protocol.setMode(i).err();

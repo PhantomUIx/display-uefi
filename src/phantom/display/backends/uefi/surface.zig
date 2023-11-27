@@ -51,7 +51,7 @@ fn impl_info(ctx: *anyopaque) anyerror!phantom.display.Surface.Info {
     const self: *Self = @ptrCast(@alignCast(ctx));
     const outputInfo = try self.output.base.info();
     return .{
-        .format = outputInfo.format,
+        .colorFormat = outputInfo.colorFormat,
         .size = outputInfo.size.res,
         .maxSize = outputInfo.size.res,
         .minSize = outputInfo.size.res,
@@ -68,14 +68,14 @@ fn impl_update_info(ctx: *anyopaque, info: phantom.display.Surface.Info, fields:
     for (fields) |field| {
         switch (field) {
             .size => try outputFields.append(.size),
-            .format => try outputFields.append(.format),
+            .colorFormat => try outputFields.append(.colorFormat),
             else => return error.UnsupportedField,
         }
     }
 
     return self.output.base.updateInfo(.{
         .scale = outputInfo.scale,
-        .format = info.format orelse outputInfo.format,
+        .colorFormat = info.colorFormat orelse outputInfo.colorFormat,
         .size = .{
             .phys = info.size.cast(f32),
             .res = info.size,
@@ -100,7 +100,7 @@ fn impl_create_scene(ctx: *anyopaque, backendType: phantom.scene.BackendType) an
             .res = outputInfo.size.res,
             .scale = outputInfo.scale,
             .physicalSize = outputInfo.size.phys,
-            .format = outputInfo.format,
+            .colorFormat = outputInfo.colorFormat,
         }),
         .target = .{ .fb = &self.fb.?.base },
     });

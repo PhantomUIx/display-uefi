@@ -37,7 +37,7 @@ fn impl_info(ctx: *anyopaque) phantom.painting.fb.Base.Info {
     const info = self.surface.output.base.info() catch |e| @panic(@errorName(e));
     return .{
         .res = info.size.res,
-        .format = info.format,
+        .colorFormat = info.colorFormat,
         .colorspace = .sRGB,
     };
 }
