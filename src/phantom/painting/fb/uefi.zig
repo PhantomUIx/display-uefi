@@ -13,6 +13,7 @@ pub fn new(surface: *Surface) !*Self {
 
     self.* = .{
         .base = .{
+            .allocator = surface.output.display.allocator,
             .vtable = &.{
                 .addr = impl_addr,
                 .info = impl_info,

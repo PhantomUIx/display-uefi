@@ -70,26 +70,15 @@ pub fn main() void {
     const flex = scene.createNode(.NodeFlex, .{
         .direction = phantom.painting.Axis.horizontal,
         .children = &[_]*phantom.scene.Node{
-            scene.createNode(.NodeArc, .{
-                .radius = @as(f32, 32.0),
-                .angles = vizops.vector.Float32Vector2.init([_]f32{ 0, std.math.tau - 0.0001 }),
-                .color = vizops.color.Any{
-                    .uint8 = .{
-                        .sRGB = .{
-                            .value = .{ 255, 0, 0, 255 },
-                        },
-                    },
-                },
-            }) catch |e| @panic(@errorName(e)),
             scene.createNode(.NodeRect, .{
                 .color = vizops.color.Any{
                     .uint8 = .{
                         .sRGB = .{
-                            .value = .{ 0, 255, 0, 255 },
+                            .value = .{ 0x24, 0x28, 0x3b, 0xff },
                         },
                     },
                 },
-                .size = vizops.vector.Float32Vector2.init([_]f32{ 10.0, 10.0 }),
+                .size = vizops.vector.Float32Vector2.init([_]f32{ 100.0, 100.0 }),
             }) catch |e| @panic(@errorName(e)),
         },
     }) catch |e| @panic(@errorName(e));
