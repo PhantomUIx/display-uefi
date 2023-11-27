@@ -339,7 +339,5 @@ pub fn main() void {
         for (children, colors[palette]) |child, color| {
             child.setProperties(.{ .color = color }) catch |e| @panic(@errorName(e));
         }
-
-        flex.setProperties(.{ .children = &children }) catch |e| @panic(@errorName(e));
     }
 }
