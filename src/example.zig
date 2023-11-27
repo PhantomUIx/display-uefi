@@ -246,6 +246,9 @@ pub fn main() void {
 
     _ = stderr.print("{}\n", .{flex}) catch {};
 
-    _ = scene.frame(flex) catch |e| @panic(@errorName(e));
-    while (true) {}
+    while (true) {
+        const seq = scene.seq;
+        _ = scene.frame(flex) catch |e| @panic(@errorName(e));
+        if (scene.seq != seq) _ = stderr.print("Frame #{}\n", .{scene.seq}) catch {};
+    }
 }
