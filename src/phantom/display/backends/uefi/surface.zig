@@ -1,10 +1,13 @@
 const std = @import("std");
 const phantom = @import("phantom");
 const Output = @import("output.zig");
+const FrameBuffer = @import("../../../painting/fb/uefi.zig");
 const Self = @This();
 
 base: phantom.display.Surface,
 output: *Output,
+fb: ?*FrameBuffer,
+scene: ?*phantom.scene.Base,
 
 pub fn new(output: *Output) !*Self {
     const self = try output.display.allocator.create(Self);
@@ -25,12 +28,18 @@ pub fn new(output: *Output) !*Self {
             .type = @typeName(Self),
         },
         .output = output,
+        .fb = null,
+        .scene = null,
     };
     return self;
 }
 
 fn impl_deinit(ctx: *anyopaque) void {
     const self: *Self = @ptrCast(@alignCast(ctx));
+
+    if (self.fb) |fb| fb.base.deinit();
+    if (self.scene) |scene| scene.deinit();
+
     self.output.display.allocator.destroy(self);
 }
 
@@ -75,7 +84,25 @@ fn impl_update_info(ctx: *anyopaque, info: phantom.display.Surface.Info, fields:
 }
 
 fn impl_create_scene(ctx: *anyopaque, backendType: phantom.scene.BackendType) anyerror!*phantom.scene.Base {
-    _ = ctx;
-    _ = backendType;
-    return error.NotImplemented;
+    const self: *Self = @ptrCast(@alignCast(ctx));
+
+    if (self.scene) |scene| return scene;
+
+    if (self.fb == null) {
+        self.fb = try FrameBuffer.new(self);
+    }
+
+    const outputInfo = try self.output.base.info();
+
+    self.scene = try phantom.scene.createBackend(backendType, .{
+        .allocator = self.output.display.allocator,
+        .frame_info = phantom.scene.Node.FrameInfo.init(.{
+            .res = outputInfo.size.res,
+            .scale = outputInfo.scale,
+            .physicalSize = outputInfo.size.phys,
+            .format = outputInfo.format,
+        }),
+        .target = .{ .fb = &self.fb.?.base },
+    });
+    return self.scene.?;
 }
