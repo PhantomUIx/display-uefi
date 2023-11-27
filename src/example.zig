@@ -31,7 +31,7 @@ pub fn panic(msg: []const u8, _: ?*std.builtin.StackTrace, ret: ?usize) noreturn
         .context = std.os.uefi.system_table.std_err.?,
     };
 
-    _ = stderr.print("{s} {?any}\n", .{ msg, ret }) catch {};
+    _ = stderr.print("{s} {any}\n", .{ msg, ret orelse @returnAddress() }) catch {};
     std.os.exit(1);
 }
 
@@ -66,6 +66,37 @@ pub fn main() void {
 
     const scene = surface.createScene(@enumFromInt(@intFromEnum(sceneBackendType))) catch |e| @panic(@errorName(e));
     _ = stderr.print("{}\n", .{scene}) catch {};
-    // TODO: render something to the scene
+
+    const flex = scene.createNode(.NodeFlex, .{
+        .direction = phantom.painting.Axis.horizontal,
+        .children = &[_]*phantom.scene.Node{
+            scene.createNode(.NodeArc, .{
+                .radius = @as(f32, 32.0),
+                .angles = vizops.vector.Float32Vector2.init([_]f32{ 0, std.math.tau - 0.0001 }),
+                .color = vizops.color.Any{
+                    .uint8 = .{
+                        .sRGB = .{
+                            .value = .{ 255, 0, 0, 255 },
+                        },
+                    },
+                },
+            }) catch |e| @panic(@errorName(e)),
+            scene.createNode(.NodeRect, .{
+                .color = vizops.color.Any{
+                    .uint8 = .{
+                        .sRGB = .{
+                            .value = .{ 0, 255, 0, 255 },
+                        },
+                    },
+                },
+                .size = vizops.vector.Float32Vector2.init([_]f32{ 10.0, 10.0 }),
+            }) catch |e| @panic(@errorName(e)),
+        },
+    }) catch |e| @panic(@errorName(e));
+    defer flex.deinit();
+
+    _ = stderr.print("{}\n", .{flex}) catch {};
+
+    _ = scene.frame(flex) catch |e| @panic(@errorName(e));
     while (true) {}
 }
