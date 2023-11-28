@@ -340,8 +340,6 @@ pub fn main() void {
             child.setProperties(.{ .color = color }) catch |e| @panic(@errorName(e));
         }
 
-        flex.setProperties(.{ .children = &children }) catch |e| @panic(@errorName(e));
-
         _ = std.os.uefi.system_table.boot_services.?.stall(1_000_000);
     }
 }
