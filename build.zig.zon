@@ -8,12 +8,12 @@
       .hash = "12208a02f49d9e18ff7b29a676810ad2f5593743006cd30c2a7d4bf8dc9ae39ce5a5",
     },
     .phantom = .{
-      .url = "https://github.com/PhantomUIx/core/archive/912fd03ced7071eb836c32362ab629bfae9d2187.tar.gz",
-      .hash = "1220090024b3b322999e728141ccff2e73ccf659d5455f60697ea31f408ec9f9688f",
+      .url = "https://github.com/PhantomUIx/core/archive/7dbfce03adb49a75f617bd3cfac0dc3e59c47fc7.tar.gz",
+      .hash = "12209991aff21e14fe54596a3b8dcc6de7c4bbf6de3c2991fda636a4dc8ba1eb71d8",
     },
     .vizops = .{
-      .url = "https://github.com/MidstallSoftware/vizops/archive/e29a12c162d01a2e53727cab3940a3c029ab2968.tar.gz",
-      .hash = "1220455bbe6f95bea0fe18cf3451ec162d60d93cb54a8a19dfdb4060951da8025116",
+      .url = "https://github.com/MidstallSoftware/vizops/archive/8b8499e195d8cf66e9b13ed1c80b24ee27420a29.tar.gz",
+      .hash = "1220f478cda5edf75a0b837e04c741631e4136e422b4257ccbd09d4cccaf736ac312",
     },
   },
 }
