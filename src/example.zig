@@ -335,9 +335,13 @@ pub fn main() void {
         _ = scene.frame(flex) catch |e| @panic(@errorName(e));
         if (scene.seq != seq) _ = stderr.print("Frame #{}\n", .{scene.seq}) catch {};
 
-        const palette = seq % colors.len;
-        for (children, colors[palette]) |child, color| {
+        const currPalette = scene.seq % colors.len;
+        for (children, colors[currPalette]) |child, color| {
             child.setProperties(.{ .color = color }) catch |e| @panic(@errorName(e));
         }
+
+        flex.setProperties(.{ .children = &children }) catch |e| @panic(@errorName(e));
+
+        _ = std.os.uefi.system_table.boot_services.?.stall(1_000_000);
     }
 }
