@@ -1,14 +1,11 @@
 const std = @import("std");
 const Phantom = @import("phantom");
 
-pub usingnamespace if (@typeInfo(@TypeOf(Phantom.Sdk)) != .Null) struct {
-    pub const phantomModule = Phantom.Sdk.PhantomModule{
-        .provides = .{
-            .displays = &.{"uefi"},
-        },
-        .dependencies = &.{ "meta+", "vizops" },
-    };
-} else struct {};
+pub const phantomModule = Phantom.Sdk.PhantomModule{
+    .provides = .{
+        .displays = &.{"uefi"},
+    },
+};
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
