@@ -4,8 +4,8 @@
   .paths = .{"."},
   .dependencies = .{
     .@"meta+" = .{
-      .url = "https://github.com/MidstallSoftware/meta-plus/archive/cadadc017bb2d768c55cc9102ad28441fae902d4.tar.gz",
-      .hash = "12208a02f49d9e18ff7b29a676810ad2f5593743006cd30c2a7d4bf8dc9ae39ce5a5",
+      .url = "https://github.com/MidstallSoftware/meta-plus/archive/2ee7b6eea70dfdf52d88c378e603e2b886fdd5c3.tar.gz",
+      .hash = "12206db0349ec554a40f23e657bbcc197bc32bf2c4f94990daa3fb11a4eab165be6e",
     },
     .phantom = .{
       .url = "https://github.com/PhantomUIx/core/archive/753ae45929ebcd960f8568642825a25de3640e4c.tar.gz",
