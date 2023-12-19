@@ -8,8 +8,8 @@
       .hash = "12206db0349ec554a40f23e657bbcc197bc32bf2c4f94990daa3fb11a4eab165be6e",
     },
     .phantom = .{
-      .url = "https://github.com/PhantomUIx/core/archive/91c8f99b33a3acc6c94d46d4c6c2b3d952664880.tar.gz",
-      .hash = "1220c8effbffa51fac185b3a1d8ef895801ea67e054b00957f58b4de725ea70d2331",
+      .url = "https://github.com/PhantomUIx/core/archive/0cbea8f53e650f4864bf41c372c330a050710c10.tar.gz",
+      .hash = "1220e811950ddd80422a486e322fdd78c55814560743da88bb9d32a890a3e0421626",
     },
     .vizops = .{
       .url = "https://github.com/MidstallSoftware/vizops/archive/8b8499e195d8cf66e9b13ed1c80b24ee27420a29.tar.gz",
