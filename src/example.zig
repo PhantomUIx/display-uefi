@@ -322,8 +322,8 @@ pub fn main() void {
     }
 
     const flex = scene.createNode(.NodeFlex, .{
-        .direction = phantom.painting.Axis.horizontal,
-        .children = children,
+        .direction = .horizontal,
+        .children = &children,
     }) catch |e| @panic(@errorName(e));
     defer flex.deinit();
 
